@@ -52,3 +52,4 @@ playing.set()
 
 @battleship.on()
 def begin():
+    pass
