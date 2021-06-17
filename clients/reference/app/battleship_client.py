@@ -5,12 +5,14 @@ import threading
 import uuid
 from battleships_pb2 import Attack, Request, Response, Status
 from battleships_pb2_grpc import BattleshipsStub
+from client_interface import ClientInterface
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class Battleship:
+class BattleshipClient(ClientInterface):
     # The gRPC turn types mapped onto handler method names
     RESPONSES = {
         Response.State.BEGIN: 'begin',
@@ -211,7 +213,8 @@ class Battleship:
         """
         cmd = args[0]
         if cmd in self.__handlers:
-            if len(args) == 1:
+            args = args[1:]
+            if not args:
                 self.__handlers[cmd]()
             else:
-                self.__handlers[cmd](args[1:])
+                self.__handlers[cmd](*args)
