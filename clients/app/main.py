@@ -2,53 +2,21 @@ import os
 import threading
 import time
 from clients.app.client import Battleship
+from clients.app.game_processes import *
 
 grpc_host = os.getenv('GRPC_HOST', 'localhost')
 grpc_port = os.getenv('GRPC_PORT', '50051')
-
-shipDictionary = {
-    "AircraftCarrier": {
-        "Code": "A",
-        "Quantity": 1,
-        "Size": 5
-    },
-    "BattleShip": {
-        "Code": "B",
-        "Quantity": 1,
-        "Size": 4
-    },
-    "Submarine": {
-        "Code": "S",
-        "Quantity": 3,
-        "Size": 3
-    },
-    "Cruiser": {
-        "Code": "C",
-        "Quantity": 1,
-        "Size": 3
-    },
-    "Destroyer": {
-        "Code": "D",
-        "Quantity": 2,
-        "Size": 2
-    },
-    "PatrolBoat": {
-        "Code": "P",
-        "Quantity": 2,
-        "Size": 1
-    }
-}
-
-shipDictionary.get("AircraftCarrier").values()
 
 playing = threading.Event()
 playing.set()
 
 battleship = Battleship(grpc_host=grpc_host, grpc_port=grpc_port)
+myBoard = Board().Generation()
 
 
 @battleship.on()
 def begin():
+
     print('Game started!')
 
 
