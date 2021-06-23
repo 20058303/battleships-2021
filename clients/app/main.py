@@ -11,61 +11,64 @@ playing = threading.Event()
 playing.set()
 
 battleship = Battleship(grpc_host=grpc_host, grpc_port=grpc_port)
-myBoard = Board().Generation()
+myBoard = Board()
+myBoard.Generation()
+lastGuess = ''
 
 
 @battleship.on()
 def begin():
-
     print('Game started!')
 
 
 @battleship.on()
 def start_turn():
-    s = input('Your move> ')
+    global lastGuess
+    s = input('Where do you want to attack? > ')
+    while not validationCheck(s)[0]:
+        print(f"{validationCheck(s)[1]}! Please Try Again.")
+        s = input("Where do you want to attack? > ")
+    lastGuess = s
     battleship.attack(s)
 
 
 @battleship.on()
 def hit():
-    print('You hit the target!')
+    myBoard.Guess(lastGuess, True)
+    print("\n > You hit something!")
 
 
 @battleship.on()
 def miss():
-    print('Aww.. You missed!')
+    myBoard.Guess(lastGuess, False)
+    print('\n > Aww.. You missed!')
 
 
 @battleship.on()
 def win():
-    print('Yay! You won!')
+    myBoard.Guess(lastGuess, True)
+    print('> Yay! You won!')
     playing.clear()
 
 
 @battleship.on()
 def lose():
-    print('Aww... You lost...')
+    print('> Aww... You lost...')
     playing.clear()
 
 
 @battleship.on()
 def attack(vector):
-    vector = vector[0]
-    print(f'Shot received at {vector}')
-    while True:
-        print("""H)it, m)iss, or d)efeat?""")
-        s = input('Enter status> ')
-        if len(s):
-            _s = s[0].upper()
-            if _s == 'H':
-                battleship.hit()
-                break
-            elif _s == 'M':
-                battleship.miss()
-                break
-            elif _s == 'D':
-                battleship.defeat()
-                break
+    print(f'Shot received at {vector}!')
+    x, y = myBoard.AttackCheck(vector)
+    if x:
+        print(f"They've struck your {y.code}!")
+        if myBoard.CheckLives():
+            battleship.defeat()
+        else:
+            battleship.hit()
+    else:
+        battleship.miss()
 
 
 print('Waiting for the game to start...')
