@@ -18,7 +18,7 @@ lastGuess = ''
 
 @battleship.on()
 def begin():
-    print('Game started!')
+    print('> Game started!')
 
 
 @battleship.on()
@@ -26,7 +26,7 @@ def start_turn():
     global lastGuess
     s = input('Where do you want to attack? > ')
     while not validationCheck(s)[0]:
-        print(f"{validationCheck(s)[1]}! Please Try Again.")
+        print(f"> {validationCheck(s)[1]}! Please Try Again.")
         s = input("Where do you want to attack? > ")
     lastGuess = s
     battleship.attack(s)
@@ -35,13 +35,15 @@ def start_turn():
 @battleship.on()
 def hit():
     myBoard.Guess(lastGuess, True)
-    print("\n > You hit something!")
+    print(myBoard.drawEnemyBoard())
+    print("\n> You hit something!")
 
 
 @battleship.on()
 def miss():
     myBoard.Guess(lastGuess, False)
-    print('\n > Aww.. You missed!')
+    print(myBoard.drawEnemyBoard())
+    print('\n> Aww.. You missed!')
 
 
 @battleship.on()
@@ -59,19 +61,20 @@ def lose():
 
 @battleship.on()
 def attack(vector):
-    print(f'Shot received at {vector}!')
-    x, y = myBoard.AttackCheck(vector)
+    print(f'\n> Shot received at {vector[0]}!')
+    x, y = myBoard.AttackCheck(vector[0])
     if x:
-        print(f"They've struck your {y.code}!")
-        if myBoard.CheckLives():
+        print(f"> They've struck your {y.code}!")
+        if myBoard.EndStateCheck():
             battleship.defeat()
         else:
             battleship.hit()
     else:
         battleship.miss()
+    print(myBoard)
 
 
-print('Waiting for the game to start...')
+print('> Waiting for the game to start...')
 battleship.join()
 while playing.is_set():
     time.sleep(1.0)
